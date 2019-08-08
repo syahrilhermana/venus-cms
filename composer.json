@@ -1,0 +1,14 @@
+{
+	"description": "Venus",
+	"name": "venus/project",
+	"type": "CMS",
+	"homepage": "http://venus.bogcamp.com",
+	"license": "MIT",
+	"require": {
+		"php": ">=7.2",
+		"guzzlehttp/guzzle": "~6.0"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "4.* || 5.*"
+	}
+}
