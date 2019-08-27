@@ -1,13 +1,28 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-trait table{
+class Model_category extends BC_Models
+{
+    // BC_Models
+    protected $table = "tbl_category";
+    protected $primaryKey = "id";
+
+    var $column_order = array(null, 'category_name', null, null);
+    var $column_search = array('category_name');
+    var $order = array('category_id' => 'asc');
+
+    // tbl_category
     public $category_id;
     public $category_name;
     public $category_banner;
     public $meta_title;
     public $meta_keyword;
     public $meta_description;
+
+    function __construct()
+    {
+        parent::__construct();
+    }
 
     public function __get($property)
     {
@@ -23,22 +38,6 @@ trait table{
         }
 
         return $this;
-    }
-}
-
-class Model_category extends BC_Models
-{
-    use table;
-    protected $table = "tbl_category";
-    protected $primaryKey = "id";
-
-    var $column_order = array(null, 'category_name', null, null);
-    var $column_search = array('category_name');
-    var $order = array('category_id' => 'asc');
-
-    function __construct()
-    {
-        parent::__construct();
     }
 
     private function _get_field_query()

@@ -33,7 +33,7 @@
 <div id="page-container" class="page-container fade page-sidebar-fixed page-header-fixed">
     <div id="header" class="header navbar-default">
         <div class="navbar-header">
-            <a href="<?php echo base_url(); ?>admin/main" class="navbar-brand"><span class="navbar-logo"></span> <b><?php echo $this->config->item('project') ?></b> CMS</a>
+            <a href="<?php echo base_url(); ?>admin/main" class="navbar-brand"><span class="navbar-venus"></span> <b><?php echo $this->config->item('project') ?></b> CMS</a>
             <button type="button" class="navbar-toggle" data-click="sidebar-toggled">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -97,14 +97,6 @@
                 </li>
             </ul>
 
-            <?php
-                $class_name = '';
-                $segment_2 = 0;
-                $segment_3 = 0;
-                $class_name = $this->router->fetch_class();
-                $segment_2 = $this->uri->segment('2');
-                $segment_3 = $this->uri->segment('3');
-            ?>
             <ul class="nav">
                 <li class="nav-header">Navigation</li>
                 <li><a href="#dashboard" data-toggle="ajax"><i class="fa fa-th-large"></i> <span>Dashboard</span></a></li>

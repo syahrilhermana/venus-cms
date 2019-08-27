@@ -1324,7 +1324,8 @@ var handleAjaxMode = function(setting) {
 	}
 	
 	function checkSidebarActive(url) {
-		var targetElm = '#sidebar [data-toggle="ajax"][href="'+ url +'"]';
+        url = url.split("/");
+		var targetElm = '#sidebar [data-toggle="ajax"][href="'+ url[0] +'"]';
 		if ($(targetElm).length !== 0) {
 			$('#sidebar li').removeClass('active');
 			$(targetElm).closest('li').addClass('active');
@@ -1582,6 +1583,7 @@ var handleDelete = function (action) {
         },
         success: function(response){
             redraw();
+            handleNotification('Notification', response.message);
             $.facebox.close();
         },
         type:"get",
@@ -1634,6 +1636,33 @@ var handleLoading = function() {
     $.facebox('<div class="loader">Loading...</div>');
 };
 
+var handleSelect2 = function(value = '') {
+    value = (value.length > 0) ? value : 'Choose item...';
+
+    $(".simple-select2").select2({ placeholder: value });
+    $(".multiple-select2").select2({ placeholder: value });
+};
+
+var handleDatepicker = function(target) {
+    $('#' + target).datepicker({
+        todayHighlight: true,
+        autoclose: true
+    });
+};
+
+var handleRedirect = function (target) {
+    var uri = window.location.href;
+    uri = uri.split('#');
+    uri = uri[0];
+
+    location.replace(uri + '#' + target);
+};
+
+var handleSlug = function (obj, target) {
+    var text = $(obj).val().toLowerCase().replace(/([^0-9^A-z])/gi, '-');
+    $('#'+target).val(text);
+};
+
 
 /* Application Controller
 ------------------------------------------------ */
@@ -1680,10 +1709,9 @@ var App = function () {
 
 		    $('.btn-load-popup').facebox();
 		},
-        initForm: function(e, f, r) {
+        initForm: function(e, f, a = '', t = '') {
             e.preventDefault();
             var formData = new FormData(f);
-            var re = (typeof table !== 'undefined') ? r : false;
 
             $.ajax({
                 url: f.action,
@@ -1698,16 +1726,34 @@ var App = function () {
                 },
                 success: function (response) {
                     $.facebox.close();
-                    if(re) {
-                        redraw();
+                    handleNotification('Notification', response.message);
+
+                    switch(a) {
+                        case 'redraw':
+                            redraw();
+                            break;
+                        case 'redirect':
+                            handleRedirect(t);
+                            break;
+                        default:
+                        // no action
                     }
                 },
                 error: function () {
-                    //
+                    handleNotification('Notification', response.message);
                 }
             });
 
             return false;
+        },
+        initSelect2: function(value) {
+		    handleSelect2(value);
+        },
+        initDatePicker: function(target) {
+		    handleDatepicker(target);
+        },
+        initSlug: function(obj, target) {
+		    handleSlug(obj, target);
         },
 		initSidebar: function() {
 			handleSidebarMenu();

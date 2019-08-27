@@ -36,12 +36,11 @@ class BC_Models extends CI_Model
     {
         $columns = is_array($columns) ? $columns : func_get_args();
 
-        $this->db->select($columns)
-            ->form($this->table);
+        $this->ci->db->select($columns);
 
-        if($limit && $offset) $this->db->limit($limit, $offset);
+        if($limit && $offset) $this->ci->db->limit($limit, $offset);
 
-        return $this->db->get()->result();
+        return $this->ci->db->get($this->table)->result();
     }
 
     /**
@@ -50,16 +49,15 @@ class BC_Models extends CI_Model
      */
     public function find($columns)
     {
-        $this->db->select('*')
-            ->form($this->table);
+        $this->ci->db->select('*');
 
         if(isset($columns)) {
             foreach ($columns as $key => $value) :
-                $this->db->where($key, $value);
+                $this->ci->db->where($key, $value);
             endforeach;
         }
 
-        return $this->db->get()->result();
+        return $this->ci->db->get($this->table)->result();
     }
 
     /**
@@ -68,10 +66,10 @@ class BC_Models extends CI_Model
      */
     public function findOne($value)
     {
-        $this->db->from($this->table)
+        $this->ci->db->from($this->table)
             ->where($this->primaryKey, $value);
 
-        return $this->db->get()->row();
+        return $this->ci->db->get()->row();
     }
 
     /**
@@ -83,16 +81,16 @@ class BC_Models extends CI_Model
         $primary = (is_object($dataSet)) ? $dataSet->id : $dataSet[$this->primaryKey];
 
         if(!isset($primary)) {
-            $this->db->trans_start();
-            $this->db->insert($this->table, $dataSet);
-            $this->lastId = $this->db->insert_id();
-            $this->db->trans_complete();
+            $this->ci->db->trans_start();
+            $this->ci->db->insert($this->table, $dataSet);
+            $this->lastId = $this->ci->db->insert_id();
+            $this->ci->db->trans_complete();
 
-            if($this->db->trans_status() === TRUE) {
-                $this->db->trans_commit();
+            if($this->ci->db->trans_status() === TRUE) {
+                $this->ci->db->trans_commit();
                 return $this->lastId;
             } else {
-                $this->db->trans_rollback();
+                $this->ci->db->trans_rollback();
                 return 0;
             }
         } else {
@@ -103,16 +101,16 @@ class BC_Models extends CI_Model
                 unset($dataSet[$this->primaryKey]);
             }
 
-            $this->db->trans_start();
-                $this->db->where($this->primaryKey, $value)
+            $this->ci->db->trans_start();
+                $this->ci->db->where($this->primaryKey, $value)
                     ->update($this->table, $dataSet);
-            $this->db->trans_complete();
+            $this->ci->db->trans_complete();
 
-            if($this->db->trans_status() === TRUE) {
-                $this->db->trans_commit();
+            if($this->ci->db->trans_status() === TRUE) {
+                $this->ci->db->trans_commit();
                 return $value;
             } else {
-                $this->db->trans_rollback();
+                $this->ci->db->trans_rollback();
                 return 0;
             }
         }
@@ -124,17 +122,45 @@ class BC_Models extends CI_Model
      */
     public function delete($value)
     {
-        $this->db->trans_start();
-        $this->db->where($this->primaryKey, $value)
-            ->delete($this->table);
-        $this->db->trans_complete();
+        if($this->softDelete)
+            $this->soft($value);
+        else
+            $this->permanent($value);
+    }
 
-        if($this->db->trans_status() === TRUE) {
-            $this->db->trans_commit();
+    public function permanent($value)
+    {
+        $this->ci->db->trans_start();
+        $this->ci->db->where($this->primaryKey, $value)
+            ->delete($this->table);
+        $this->ci->db->trans_complete();
+
+        if($this->ci->db->trans_status() === TRUE) {
+            $this->ci->db->trans_commit();
             return true;
         } else {
-            $this->db->trans_rollback();
+            $this->ci->db->trans_rollback();
             return false;
+        }
+    }
+
+    /**
+     * @param $value
+     * @return int
+     */
+    public function soft($value)
+    {
+        $this->ci->db->trans_start();
+        $this->ci->db->where($this->primaryKey, $value)
+            ->update($this->table, array("deleted_at", "now()"));
+        $this->ci->db->trans_complete();
+
+        if($this->ci->db->trans_status() === TRUE) {
+            $this->ci->db->trans_commit();
+            return $value;
+        } else {
+            $this->ci->db->trans_rollback();
+            return 0;
         }
     }
 

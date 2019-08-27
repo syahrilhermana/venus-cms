@@ -8,19 +8,195 @@ class News extends CI_Controller
         parent::__construct();
         $this->load->model('admin/Model_common');
         $this->load->model('admin/Model_news');
+        $this->load->model('admin/Model_category');
     }
 
-	public function index()
-	{
-		$data['setting'] = $this->Model_common->get_setting_data();
-		$data['news'] = $this->Model_news->show();
+    public function index()
+    {
+        $this->load->view('admin/news/news/index', array());
+    }
 
-		$this->load->view('admin/view_header',$data);
-		$this->load->view('admin/view_news',$data);
-		$this->load->view('admin/view_footer');
-	}
+    public function ajax_list()
+    {
+        $length = (!empty($_GET['length'])) ? $_GET['length'] : 10;
+        $start = (!empty($_GET['start'])) ? $_GET['start'] : 0;
+        $draw = (!empty($_GET['draw'])) ? $_GET['draw'] : 10;
 
-	public function add()
+        $model = new Model_news();
+        $list = $model->findFiltered($length, $start);
+        $data = array();
+        $no = $start;
+
+        foreach ($list as $row) {
+            $no++;
+            $set = array();
+            $set[] = $no;
+            $set[] = $row->news_title;
+            $set[] = '<img src="'.base_url().'public/uploads/'.$row->photo.'" alt="'.$row->news_title.'" style="width:250px;">';
+            $set[] = '<img src="'.base_url().'public/uploads/'.$row->banner.'" alt="'.$row->news_title.'" style="width:250px;">';
+            $set[] = categoryText($row->category_id);
+            $set[] = '<div class="btn-group">
+                        <a href="'.base_url('admin/news/edit/'.$row->news_id).'" class="btn btn-primary btn-xs"><i class="fa fa-edit"></i>&nbsp; Edit</a>
+                        <button data-id="'.$row->news_id.'" class="btn btn-danger btn-xs" onClick="App.confirmPopUp(this, handleDelete, \'Confirmation\', \'Are you sure you want to delete this data?\', \'Yes\', \'No\', \''.base_url().'admin/news/delete/\')"><i class="fa fa-trash"></i>&nbsp; Delete</button>
+                      </div>';
+
+            $data[] = $set;
+        }
+
+        $output = array(
+            'draw' => $draw,
+            'recordsTotal' => $model->count(),
+            'recordsFiltered' => $model->countFiltered(),
+            'data' => $data
+        );
+
+        echo json_encode($output);
+    }
+
+    public function add()
+    {
+        $model = new Model_category();
+        $data = array(
+            'categories'    => $model->all()
+        );
+
+        $this->load->view('admin/news/news/add', $data);
+    }
+
+	public function save()
+    {
+        $error = '';
+        $valid = 1;
+
+        $id = $this->input->post('id');
+        if(isset($id)) {
+            $valid = 1;
+
+            $this->form_validation->set_rules('category_name', 'Category Name', 'trim|required');
+
+            if($this->form_validation->run() == FALSE) {
+                $valid = 0;
+                $error .= validation_errors();
+            }
+
+            $path = $_FILES['banner']['name'];
+            $path_tmp = $_FILES['banner']['tmp_name'];
+
+            if($path!='') {
+                $ext = pathinfo( $path, PATHINFO_EXTENSION );
+                $file_name = basename( $path, '.' . $ext );
+                $ext_check = $this->Model_common->extension_check_photo($ext);
+                if($ext_check == FALSE) {
+                    $valid = 0;
+                    $error .= 'You must have to upload jpg, jpeg, gif or png file for banner<br>';
+                }
+            }
+
+            if($valid == 1)
+            {
+                $data['category'] = $this->Model_category->get_category($id);
+
+                if($path == '') {
+                    $form_data = array(
+                        'category_name'    => $_POST['category_name'],
+                        'meta_title'       => $_POST['meta_title'],
+                        'meta_keyword'     => $_POST['meta_keyword'],
+                        'meta_description' => $_POST['meta_description']
+                    );
+                    $this->Model_category->update($id,$form_data);
+                }
+                else {
+                    unlink('./public/uploads/'.$data['category']['category_banner']);
+
+                    $final_name = 'category-banner-'.$id.'.'.$ext;
+                    move_uploaded_file( $path_tmp, './public/uploads/'.$final_name );
+
+                    $form_data = array(
+                        'category_name'    => $_POST['category_name'],
+                        'category_banner'  => $final_name,
+                        'meta_title'       => $_POST['meta_title'],
+                        'meta_keyword'     => $_POST['meta_keyword'],
+                        'meta_description' => $_POST['meta_description']
+                    );
+                    $this->Model_category->update($id,$form_data);
+                }
+
+                $output = array(
+                    'status'    => true,
+                    'message'   => 'Category is updated successfully'
+                );
+
+                echo json_encode($output);
+            }
+            else
+            {
+                $output = array(
+                    'status'    => false,
+                    'message'   => $error
+                );
+
+                echo json_encode($output);
+            }
+        } else {
+            $this->form_validation->set_rules('category_name', 'Category Name', 'trim|required');
+
+            if($this->form_validation->run() == FALSE) {
+                $valid = 0;
+                $error .= validation_errors();
+            }
+
+            $path = $_FILES['banner']['name'];
+            $path_tmp = $_FILES['banner']['tmp_name'];
+
+            if($path!='') {
+                $ext = pathinfo( $path, PATHINFO_EXTENSION );
+                $file_name = basename( $path, '.' . $ext );
+                $ext_check = $this->Model_common->extension_check_photo($ext);
+                if($ext_check == FALSE) {
+                    $valid = 0;
+                    $error .= 'You must have to upload jpg, jpeg, gif or png file for banner<br>';
+                }
+            } else {
+                $valid = 0;
+                $error .= 'You must have to select a photo for banner<br>';
+            }
+
+            if($valid == 1) {
+                $next_id = $this->Model_category->get_auto_increment_id();
+                foreach ($next_id as $row) {
+                    $ai_id = $row['Auto_increment'];
+                }
+
+                $final_name = 'category-banner-' . $ai_id . '.' . $ext;
+                move_uploaded_file($path_tmp, './public/uploads/' . $final_name);
+
+                $form_data = array(
+                    'category_name' => $_POST['category_name'],
+                    'category_banner' => $final_name,
+                    'meta_title' => $_POST['meta_title'],
+                    'meta_keyword' => $_POST['meta_keyword'],
+                    'meta_description' => $_POST['meta_description']
+                );
+                $this->Model_category->add($form_data);
+
+                $output = array(
+                    'status'    => true,
+                    'message'   => 'Category is added successfully!'
+                );
+
+                echo json_encode($output);
+            } else {
+                $output = array(
+                    'status'    => true,
+                    'message'   => $error
+                );
+
+                echo json_encode($output);
+            }
+        }
+    }
+
+	public function add_old()
 	{
 		$data['setting'] = $this->Model_common->get_setting_data();
 

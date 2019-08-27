@@ -7,7 +7,7 @@
     </div>
 
     <div class="panel-body">
-        <?php echo form_open_multipart(base_url().'admin/category/save',array('onsubmit' => 'App.initForm(event, this, true);', 'id' => 'form-data', 'class' => 'form-horizontal', 'data-parsley-validate' => 'true', 'name' => 'form', 'novalidate' => '')); ?>
+        <?php echo form_open_multipart(base_url().'admin/category/save',array('onsubmit' => 'App.initForm(event, this, \'redraw\');', 'id' => 'form-data', 'class' => 'form-horizontal', 'data-parsley-validate' => 'true', 'name' => 'form', 'novalidate' => '')); ?>
             <input type="hidden" name="id" value="<?php echo $category['category_id']; ?>">
             <div class="form-group row m-b-15">
                 <label class="col-md-4 col-sm-4 col-form-label" for="fullname">Category Name * :</label>

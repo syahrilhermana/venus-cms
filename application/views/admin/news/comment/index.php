@@ -28,7 +28,7 @@
 <ol class="breadcrumb pull-right">
     <li class="breadcrumb-item"><a href="javascript:;">Home</a></li>
     <li class="breadcrumb-item"><a href="javascript:;">News</a></li>
-    <li class="breadcrumb-item active">Category</li>
+    <li class="breadcrumb-item active">Facebook Comment Setup</li>
 </ol>
 
 <h1 class="page-header">&nbsp;</h1>
@@ -40,27 +40,27 @@
                 <div class="panel-heading-btn">
                     <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
                 </div>
-                <h4 class="panel-title">Category</h4>
+                <h4 class="panel-title">Facebook Comment Setup</h4>
             </div>
             <!-- end panel-heading -->
             <!-- begin panel-body -->
-            <div class="pull-right">
-                <a href="javascript:;" onclick="App.loadIntoBox('<?php echo base_url('admin/category/add') ?>')" class="btn btn-success btn-form"><span class="fa fa-plus-square fa-lg"></span>&nbsp; Add New</a>
-            </div>
 
             <div class="panel-body">
-                <table id="table" class="table table-striped table-bordered">
-                    <thead>
-                    <tr>
-                        <th width="1%"></th>
-                        <th class="text-nowrap">Category Name</th>
-                        <th class="text-nowrap" width="250px">Banner</th>
-                        <th class="text-nowrap" width="95px">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+                <p style="padding-bottom: 20px;">Go to the facebook developer section (<a href="https://developers.facebook.com/docs/plugins/comments/">https://developers.facebook.com/docs/plugins/comments/</a>) to get your comment codes.</p>
+                <?php echo form_open_multipart(base_url().'admin/comment/save',array('onsubmit' => 'App.initForm(event, this, \'\');', 'id' => 'form-data', 'class' => 'form-horizontal', 'data-parsley-validate' => 'true', 'name' => 'form', 'novalidate' => '')); ?>
+                <div class="form-group row m-b-15">
+                    <label class="col-md-3 col-sm-3 col-form-label" for="fullname">Code to use after the opening &lt;body&gt; tag :</label>
+                    <div class="col-md-9 col-sm-9">
+                        <textarea class="form-control" name="code_body" style="height:300px;"><?php echo $comment->code_body ?></textarea>
+                    </div>
+                </div>
+                <div class="form-group row m-b-0">
+                    <label class="col-md-3 col-sm-3 col-form-label">&nbsp;</label>
+                    <div class="col-md-9 col-sm-9">
+                        <input type="submit" class="btn btn-primary btn-save" value="Update" />
+                    </div>
+                </div>
+                <?php echo form_close(); ?>
             </div>
         </div>
     </div>
@@ -68,10 +68,6 @@
 
 <script>
     $(document).ready(function() {
-        DrawTable.ajax("<?php echo base_url() ?>admin/category/ajax_list", "table");
+        //
     });
-
-    function redraw() {
-        DrawTable.redraw("table");
-    }
 </script>

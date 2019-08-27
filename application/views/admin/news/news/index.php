@@ -11,7 +11,7 @@
 <ol class="breadcrumb pull-right">
     <li class="breadcrumb-item"><a href="javascript:;">Home</a></li>
     <li class="breadcrumb-item"><a href="javascript:;">News</a></li>
-    <li class="breadcrumb-item active">Category</li>
+    <li class="breadcrumb-item active">News</li>
 </ol>
 
 <h1 class="page-header">&nbsp;</h1>
@@ -23,12 +23,12 @@
                 <div class="panel-heading-btn">
                     <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
                 </div>
-                <h4 class="panel-title">Category</h4>
+                <h4 class="panel-title">News</h4>
             </div>
             <!-- end panel-heading -->
             <!-- begin panel-body -->
             <div class="pull-right">
-                <a href="javascript:;" onclick="App.loadIntoBox('<?php echo base_url('admin/category/add') ?>')" class="btn btn-success btn-form"><span class="fa fa-plus-square fa-lg"></span>&nbsp; Add New</a>
+                <a href="#news/add" class="btn btn-success btn-form"><span class="fa fa-plus-square fa-lg"></span>&nbsp; Add News</a>
             </div>
 
             <div class="panel-body">
@@ -36,8 +36,10 @@
                     <thead>
                     <tr>
                         <th width="1%"></th>
-                        <th class="text-nowrap">Category Name</th>
+                        <th class="text-nowrap">Title</th>
+                        <th class="text-nowrap" width="250px">Photo</th>
                         <th class="text-nowrap" width="250px">Banner</th>
+                        <th class="text-nowrap" width="100px">Category</th>
                         <th class="text-nowrap" width="95px">Action</th>
                     </tr>
                     </thead>
@@ -51,7 +53,7 @@
 
 <script>
     $(document).ready(function() {
-        DrawTable.ajax("<?php echo base_url() ?>admin/category/ajax_list", "table");
+        DrawTable.ajax("<?php echo base_url() ?>admin/news/ajax_list", "table");
     });
 
     function redraw() {

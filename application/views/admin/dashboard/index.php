@@ -40,7 +40,7 @@
             <div class="stats-icon"><i class="fa fa-comment"></i></div>
             <div class="stats-info">
                 <h4>SUBSCRIBER</h4>
-                <p>673,204</p>
+                <p><?php echo totalSubscriber() ?></p>
             </div>
             <div class="stats-link">
                 <a href="javascript:;">View Detail <i class="fa fa-arrow-alt-circle-right"></i></a>

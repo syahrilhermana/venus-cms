@@ -132,7 +132,7 @@ class Category extends BC_Admin
             else
             {
                 $output = array(
-                    'status'    => true,
+                    'status'    => false,
                     'message'   => $error
                 );
 

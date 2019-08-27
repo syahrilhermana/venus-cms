@@ -21,15 +21,10 @@ var handleDataTableAjax = function(url, table) {
 
     if ($('#' + table).length !== 0) {
         $('#' + table).DataTable({
-            responsive: true,
             processing: true,
             serverSide: true,
             deferRender: true,
-            scrollY: 500,
-            scrollCollapse: true,
-            scroller: true,
             colReorder: true,
-            rowReorder: true,
             ajax: {
                 url: url + handleUrlParameters(),
                 type: "get"
